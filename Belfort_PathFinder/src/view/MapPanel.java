@@ -2,7 +2,9 @@ package view;
 
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
 import javax.swing.JPanel;
 
 public class MapPanel extends JPanel{
@@ -11,14 +13,15 @@ public class MapPanel extends JPanel{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private BufferedImage map;
+	private Image map;
 	private int mapWidth;
 	private int mapHeight;
+	private AffineTransform xaffine;
 	
 	public MapPanel(String mapPath, int defaultSize){
-	
-	
-		init();
+		
+	 map = Toolkit.getDefaultToolkit().getImage(mapPath);
+	 init();
 			
 	}
 	
@@ -27,6 +30,14 @@ public class MapPanel extends JPanel{
 		setMapHeight(map.getHeight(null));
 	    setBackground(new Color(0xc0, 0xc0, 0xc0));
 	    setOpaque(true);
+	}
+	
+	public Image getMap(){
+		return map;
+	}
+	
+	public void setMap(Image map){
+		this.map=map;
 	}
 
 	public int getMapWidth() {
@@ -43,6 +54,14 @@ public class MapPanel extends JPanel{
 
 	public void setMapHeight(int mapHeight) {
 		this.mapHeight = mapHeight;
+	}
+
+	public AffineTransform getXaffine() {
+		return xaffine;
+	}
+
+	public void setXaffine(AffineTransform xaffine) {
+		this.xaffine = xaffine;
 	}
 	
 }

@@ -19,12 +19,6 @@ public class GUI extends JFrame {
     private int clientHeight;
   
 	
-	/**
-	 * 
-	 */
-	/**
-	 * 
-	 */
 	public GUI(){
 		
 		super();
@@ -50,6 +44,11 @@ public class GUI extends JFrame {
         clientWidth = (int)(screenDimension.getWidth()-insets.left-insets.right); 
         clientHeight = (int)(screenDimension.getHeight()-insets.top-insets.bottom); 
         setPreferredSize(new Dimension(clientWidth,clientHeight));
+        
+        //instantiate map
+        String mapPath="baseline\region_belfort_routes_fleuves_habitats.gif";
+        int defaultSize=30;
+        MapPanel belfortMap= new MapPanel(mapPath, defaultSize);
         
    
         //instantiate GUI
