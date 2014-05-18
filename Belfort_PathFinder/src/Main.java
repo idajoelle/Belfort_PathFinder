@@ -1,3 +1,6 @@
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import view.GUI;
 
 
@@ -7,11 +10,18 @@ public static void init(){
 }
 	public static void main(String[] args) {
 		
-		 javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	            public void run() {
-	                init();
-	            }
-	        });
+	    SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception e) {
+                  
+                }
+              init();
+            }
+        });
+		
+		
 
 	}
 
