@@ -21,6 +21,11 @@ public class SetOfStreet {
 		points.add(node);
 	}
 	
+	/*public void addNodes(int num,Node node){
+		//points.add(num,x,y);
+		points.add(num, node);
+	}
+	*/
 	//TODO add a new street
 	public void addStreet(Street street){
 		streets.add(street);

@@ -21,6 +21,13 @@ public class Node {
 	}
 
 
+	public Node(float x, float y) {
+	
+		this.x = x;
+		this.y = y;
+	}
+
+
 	public int getNum() {
 		return num;
 	}
