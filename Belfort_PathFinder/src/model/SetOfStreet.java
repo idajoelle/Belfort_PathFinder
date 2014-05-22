@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-
 public class SetOfStreet {
 	
 	private ArrayList<Node> points;
@@ -9,6 +8,8 @@ public class SetOfStreet {
 	
 	
 	public SetOfStreet() {
+		points = new ArrayList<Node>();
+		streets = new ArrayList<Street>();
 	}
 
 	public SetOfStreet(ArrayList<Node> points, ArrayList<Street> streets) {
@@ -41,5 +42,12 @@ public class SetOfStreet {
 		
 		return points;
 		
+	}
+
+	@Override
+	public String toString() {
+		return "SetOfStreet [points=" + points + ", streets=" + streets + "]";
 	}	
+	
+	
 }
