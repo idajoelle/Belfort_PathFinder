@@ -20,11 +20,24 @@ public class PathFinder {
 	private SetOfStreet sos;
 	private String xmlFileName;
 	private String imgName;
+	private static PathFinder pathfinder;
+	
 	
 	public PathFinder(String xmlFileName){
-	sos = new SetOfStreet();
+		sos = new SetOfStreet();
 		recupXml(xmlFileName);
 		
+	}
+	
+	private PathFinder(){
+		sos = new SetOfStreet();
+	}
+	
+	public static PathFinder getInstance(){
+		if (pathfinder==null){
+			pathfinder= new PathFinder();		
+		}
+		return pathfinder;
 	}
 	
 	//TODO return SetOfStreet
