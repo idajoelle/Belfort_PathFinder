@@ -1,62 +1,152 @@
 package view;
 
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 
-import javax.swing.JPanel;
+import javax.swing.BorderFactory;
 
-public class MapPanel extends JPanel{
+import model.Run;
+import controller.MapController;
 
-	/**
-	 * 
-	 */
+public class MapPanel extends ScrollablePanel {
+
+	protected double smoothScale = 1.0D;
 	private static final long serialVersionUID = 1L;
 	private Image map;
+	private float zoom_percentage;
 	private int mapWidth;
 	private int mapHeight;
 	private AffineTransform xaffine;
-	private Dimension mapSize = new Dimension(0, 0);
+	private float zoom = 1f;
 	private Point mapPosition = new Point(0, 0);
-    private int zoom;
-    //
-    private boolean useAnimations = true;
-    private MapAnimation animation;
-    
-    //constants
-    private static final int TILE_SIZE = 256;
-    
-	
-	public MapPanel(String mapPath){
-		
-	 map = Toolkit.getDefaultToolkit().getImage(mapPath);
-	 init();		
+	private Run run;
+	private int smoothOffset = 0;
+	private Point smoothPosition, smoothPivot;
+	private MapController mouseListener = new MapController(run);
+
+	public MapPanel(String mapPath, int size) {
+		super(size);
+		map = Toolkit.getDefaultToolkit().getImage(mapPath);
+		setBackground(new Color(254, 253, 254));
+		init();
+
 	}
-	
-	public void init(){
+
+	public void init() {
 		setMapWidth(map.getWidth(null));
 		setMapHeight(map.getHeight(null));
-	    setBackground(new Color(60, 60, 60));
-	    setOpaque(true);
+		setZoomZoom(Run.ZOOM_INITIAL);
+		setOpaque(true);
 	}
-	
-	public void paintComponent(Graphics g){
-	super.paintComponent(g);
-	g.drawImage(map, 0, 0, getWidth(), getHeight(), this);
+
+	// initial zoom on launch
+	public void setZoomZoom(float zoom) {
+		zoom_percentage = zoom;
+		super.setMaxUnitIncrement(zoom);
+		xaffine = new AffineTransform();
+		xaffine.scale(zoom_percentage, zoom_percentage);
+		int zoomWidth = (int) (mapWidth * zoom_percentage);
+		int zoomHeight = (int) (mapHeight * zoom_percentage);
+		setSize(new Dimension(400, 200));
+		setBorder(BorderFactory.createEmptyBorder(zoomHeight, zoomWidth, 0, 0));
 	}
-	
- 
-	public Image getMap(){
+
+	/**
+	 * public String DistanceUnitConverter(double px, float zoom) { String unite
+	 * = "m"; double m = (double)(px * (double) getSCALE_SIZE() *
+	 * (double)((double)1 / (double)zoom)); if (m > 1000) { m /= 1000; unite =
+	 * "km"; } m = ((double) Math.round(m * 100)) / 100; return new String(m +
+	 * " " + unite); }
+	 */
+
+	//map listener
+	public void mapPanelListener(MapController listener) {
+		addMouseMotionListener(listener);
+		addMouseListener(listener);
+		addMouseWheelListener(listener);
+	}
+
+	//zoom-
+	public void zoomIn(Point pivot) {
+		if (getZoom() >= Run.ZOOM_MAX)
+			return;
+		Point mapPosition = getMapPosition();
+		int dx = pivot.x;
+		int dy = pivot.y;
+		run.defineZoom((float) Run.ZOOM_MINUS);
+		setMapPosition(mapPosition.x * 2 + dx, mapPosition.y * 2 + dy);
+		repaint();
+	}
+
+	//zoom+
+	public void zoomOut(Point pivot) {
+		if (getZoom() <= Run.ZOOM_MIN)
+			return;
+		Point mapPosition = getMapPosition();
+		int dx = pivot.x;
+		int dy = pivot.y;
+		run.defineZoom((float) Run.ZOOM_PLUS);
+		setMapPosition((mapPosition.x - dx) / 2, (mapPosition.y - dy) / 2);
+		repaint();
+	}
+    //animation rectangle on zoom
+	/**
+	 * private void drawScaledRect(Graphics2D g, int cx, int cy, double f,
+	 * double scale) { AffineTransform oldTransform = g.getTransform();
+	 * g.translate(cx, cy); g.scale(scale, scale); g.translate(-cx, -cy); int c
+	 * = 0x80 + (int) Math.floor(f * 0x60); if (c < 0) c = 0; else if (c > 255)
+	 * c = 255; Color color = new Color(c, c, c); g.setColor(color);
+	 * g.drawRect(cx - 40, cy - 30, 80, 60); g.setTransform(oldTransform); }
+	 */
+
+	//paint method surcharge
+	synchronized public void paint(Graphics g) {
+		super.paint(g);
+		//super.paintChildren(g);
+		Graphics2D gg = (Graphics2D) g;
+		gg.setColor(getBackground());
+		gg.drawImage(map, xaffine, null);
+		gg.setColor(Color.black);
+		gg.dispose();
+	}
+	public Point getCursorPosition() {
+		return new Point(mapPosition.x + mouseListener.getMouseCoords().x,
+				mapPosition.y + mouseListener.getMouseCoords().y);
+	}
+
+	public void setCenterPosition(Point p) {
+		setMapPosition(p.x - getWidth() / 2, p.y - getHeight() / 2);
+	}
+
+	public Point getMapPosition() {
+		return new Point(mapPosition.x, mapPosition.y);
+	}
+
+	public void setMapPosition(Point mapPosition) {
+		setMapPosition(mapPosition.x, mapPosition.y);
+	}
+
+	public void setMapPosition(int x, int y) {
+		if (mapPosition.x == x && mapPosition.y == y)
+			return;
+		Point oldMapPosition = getMapPosition();
+		mapPosition.x = x;
+		mapPosition.y = y;
+		firePropertyChange("mapPosition", oldMapPosition, getMapPosition());
+	}
+
+	public Image getMap() {
 		return map;
 	}
-	
-	public void setMap(Image map){
-		this.map=map;
+
+	public void setMap(Image map) {
+		this.map = map;
 	}
 
 	public int getMapWidth() {
@@ -75,6 +165,14 @@ public class MapPanel extends JPanel{
 		this.mapHeight = mapHeight;
 	}
 
+	public float getZoom_percentage() {
+		return zoom_percentage;
+	}
+
+	public void setZoom_percentage(float zoom_percentage) {
+		this.zoom_percentage = zoom_percentage;
+	}
+
 	public AffineTransform getXaffine() {
 		return xaffine;
 	}
@@ -83,67 +181,38 @@ public class MapPanel extends JPanel{
 		this.xaffine = xaffine;
 	}
 
-	public Dimension getMapSize() {
-		return mapSize;
-	}
-
-	public void setMapSize(Dimension mapSize) {
-		this.mapSize = mapSize;
-	}
-
-	public Point getMapPosition() {
-		 return new Point(mapPosition.x, mapPosition.y);
-	}
-
-	public void setMapPosition(Point mapPosition) {
-		setMapPosition(mapPosition.x, mapPosition.y);
-	}
-	  
-	public void setMapPosition(int x, int y) {
-	        if (mapPosition.x == x && mapPosition.y == y)
-	            return;
-	        Point oldMapPosition = getMapPosition();
-	        mapPosition.x = x;
-	        mapPosition.y = y;
-	        firePropertyChange("mapPosition", oldMapPosition, getMapPosition());
-	    }
-
-	    public void translateMapPosition(int tx, int ty) {
-	        setMapPosition(mapPosition.x + tx, mapPosition.y + ty);
-	    }
-
-	public int getZoom() {
+	
+	public float getZoom() {
 		return zoom;
 	}
 
-	public void setZoom(int zoom) {
-		  if (zoom == this.zoom)
-	            return;
-	        int oldZoom = this.zoom;
-	       // this.zoom = Math.min(map.getMaxZoom(), zoom);
-	       // mapSize.width = getXMax();
-	      //  mapSize.height = getYMax();
-	        firePropertyChange("zoom", oldZoom, zoom);
+	public void setZoom(float zoom) {
+		this.zoom = zoom;
 	}
 
-	public boolean isUseAnimations() {
-		return useAnimations;
+	public Point getSmoothPivot() {
+		return smoothPivot;
 	}
 
-	public void setUseAnimations(boolean useAnimations) {
-		this.useAnimations = useAnimations;
+	public Point setSmoothPivot(Point smoothPivot) {
+		this.smoothPivot = smoothPivot;
+		return smoothPivot;
 	}
 
-	public MapAnimation getAnimation() {
-		return animation;
+	public Point getSmoothPosition() {
+		return smoothPosition;
 	}
 
-	public void setAnimation(MapAnimation animation) {
-		this.animation = animation;
+	public void setSmoothPosition(Point smoothPosition) {
+		this.smoothPosition = smoothPosition;
 	}
 
-	public static int getTileSize() {
-		return TILE_SIZE;
+	public int getSmoothOffset() {
+		return smoothOffset;
 	}
-	
+
+	public void setSmoothOffset(int smoothOffset) {
+		this.smoothOffset = smoothOffset;
+	}
+
 }
