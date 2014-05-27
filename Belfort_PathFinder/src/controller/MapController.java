@@ -19,6 +19,7 @@ private Run run;
 	private final int WHEEL_TICKS = 3;
 	private int nbTicks = 0;
 	private int prevX = 0;
+	private Point position ;
 	private int prevY = 0;
 	private Point mouseCoords;
 	
@@ -30,7 +31,21 @@ private Run run;
   //Methods required by the MouseMotionListener interface
   public void mouseMoved(MouseEvent e) {
   	//app.updateCoord(e.getX(),e.getY());
+	  // Passage de la souris
+      if(e.getButton()==MouseEvent.MOUSE_MOVED)
+      {
+           // Récupération de la position
+           this.position = e.getPoint();
+    
+      }
+      
   }
+  
+  // Return the position of mousepoint
+  public Point getPos(){
+	  return this.position;
+  }
+  
   public void mouseDragged(MouseEvent e) {
 	  run.translateMap(prevX-e.getX(), prevY-e.getY());
   }

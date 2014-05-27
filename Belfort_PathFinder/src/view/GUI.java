@@ -41,7 +41,9 @@ public class GUI extends JFrame {
 	private ControlPanel controlPanel = new ControlPanel();
 	private OverlayPanel overlayPanel = new OverlayPanel();
 
-	
+
+    static final int DEFAULT_WIDTH = 200;
+    static final int DEFAULT_HEIGHT = 150;
 	Border raisedbevel = BorderFactory.createRaisedBevelBorder();
 	Border loweredbevel = BorderFactory.createLoweredBevelBorder();
 	Border coumpoundBorder = BorderFactory.createCompoundBorder(raisedbevel,
@@ -73,14 +75,18 @@ public class GUI extends JFrame {
 		clientHeight = (int) (screenDimension.getHeight() - insets.top - insets.bottom);
 		setPreferredSize(new Dimension(clientWidth, clientHeight));
 
-		
+	
 		// instantiate mapView
 		MapPanel map = new MapPanel(mapPath, 40);
+		//map.add(overlayPanel);
+		//MapPanel m = new MapPanel(mapPath, 40,map);
+		 setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		
 		//map.add(overlayPanel);
 		//map.add(controlPanel);
 		belfortMap = new MapView(map);
 		belfortMap.setPreferredSize(new Dimension(clientWidth, clientHeight));
-		//belfortMap.add(overlayPanel);
+		belfortMap.add(overlayPanel);
 		//belfortMap.add(controlPanel);
 		belfortMap.setBorder(coumpoundBorder);
 		

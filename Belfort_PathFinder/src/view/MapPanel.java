@@ -10,7 +10,9 @@ import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 
 import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 
+import model.PathFinder;
 import model.Run;
 import controller.MapController;
 
@@ -19,12 +21,15 @@ public class MapPanel extends ScrollablePanel {
 	protected double smoothScale = 1.0D;
 	private static final long serialVersionUID = 1L;
 	private Image map;
+	private JPanel t;
 	private float zoom_percentage;
 	private int mapWidth;
 	private int mapHeight;
 	private AffineTransform xaffine;
 	private float zoom = 1f;
 	private Point mapPosition = new Point(0, 0);
+	//Test path finder
+	private PathFinder path = PathFinder.getInstance();
 	private Run run;
 	private int smoothOffset = 0;
 	private Point smoothPosition, smoothPivot;
@@ -32,11 +37,37 @@ public class MapPanel extends ScrollablePanel {
 
 	public MapPanel(String mapPath, int size) {
 		super(size);
+		
+		path.recupXml("C:/Users/ida/Documents/GitHub/Belfort_PathFinder/Belfort_PathFinder/baseline/region_belfort_streets.xml");
 		map = Toolkit.getDefaultToolkit().getImage(mapPath);
+	
 		setBackground(new Color(254, 253, 254));
+	
 		init();
 
 	}
+	
+	
+
+	public JPanel getT() {
+		return t;
+	}
+
+
+
+
+	public MapPanel(int size,String mapPath, JPanel t) {
+		super(size);
+		map = Toolkit.getDefaultToolkit().getImage(mapPath);
+		
+		this.t = t;
+		setBackground(new Color(254, 253, 254));
+	
+		init();
+		
+	}
+
+
 
 	public void init() {
 		setMapWidth(map.getWidth(null));
@@ -113,6 +144,9 @@ public class MapPanel extends ScrollablePanel {
 		gg.setColor(getBackground());
 		gg.drawImage(map, xaffine, null);
 		gg.setColor(Color.black);
+		
+		path.drawNodes(gg, path.getSos().getNodes(), 10);
+		
 		gg.dispose();
 	}
 	public Point getCursorPosition() {

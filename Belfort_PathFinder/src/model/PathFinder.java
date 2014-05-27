@@ -1,14 +1,23 @@
 package model;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+
+
+
 //import javax.swing.text.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+
+
 
 //import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Element;
@@ -20,9 +29,15 @@ public class PathFinder {
 	private SetOfStreet sos;
 	private String xmlFileName;
 	private String imgName;
+	
 	private static PathFinder pathfinder;
-	
-	
+	//Declaration of constants
+	private final Node LAMBERT_HAUT_GAUCHE = new Node(897990, 2324046);
+	private final Node LAMBERT_BAS_DROITE = new Node(971518, 2272510);
+	private final Node PIXELS_BAS_DROITE = new Node(9807, 6867);
+	//private final String SYSTEME_UNITE = "Lambert II";
+	//private final int MARGE_REDIMENSIONNEMENT_AUTO = 50;
+
 	public PathFinder(String xmlFileName){
 		sos = new SetOfStreet();
 		recupXml(xmlFileName);
@@ -54,7 +69,40 @@ public class PathFinder {
 	public String getImgName() {
 		return imgName;
 	}
+	
+	
+	//conversion 
+	
+	public Node getLambertCoords(Node nodePixel) {
+		int etendue_x = (int) (LAMBERT_BAS_DROITE.getX() - LAMBERT_HAUT_GAUCHE.getX());
+		int etendue_y = (int) (LAMBERT_BAS_DROITE.getY() - LAMBERT_HAUT_GAUCHE.getY());
+		double lambert_zero_x = nodePixel.getX() * etendue_x / PIXELS_BAS_DROITE.getX();
+		double lambert_zero_y = nodePixel.getY() * etendue_y / PIXELS_BAS_DROITE.getY();
+		int x = (int) (LAMBERT_HAUT_GAUCHE.getX() + lambert_zero_x);
+		int y = (int) (LAMBERT_HAUT_GAUCHE.getY() + lambert_zero_y);
+		return new Node(x, y);
+	}
+	
 
+	//
+	
+	public ArrayList<Node> getConversionNodes(ArrayList<Node> n){
+		
+		for(int l=0;l<n.size();l++){
+			n.get(l).setNode(getLambertCoords(n.get(l)));
+		}
+		return new ArrayList<Node>(n);
+	}
+	
+	public void drawNodes(Graphics g, ArrayList<Node> n, int size){
+		for(int l=0; l<n.size();l++){
+			g.setColor(Color.BLACK);
+			g.drawOval((int)n.get(l).getX() - size/2, (int)n.get(l).getY() - size/2, size, size);
+			g.fillOval((int)n.get(l).getX()  - size/2, (int)n.get(l).getY()  - size/2, size, size);
+			}
+		
+	}
+	
 	// TODO Parse File
 	public void recupXml(String xmlFileName){
 		this.xmlFileName = xmlFileName;
@@ -128,11 +176,11 @@ public class PathFinder {
 	}
 	
 	
-	public static void main(String[] args) throws ParseException{
+/*	public static void main(String[] args) throws ParseException{
 		PathFinder path = new PathFinder("C:/Users/ida/Documents/GitHub/Belfort_PathFinder/Belfort_PathFinder/baseline/region_belfort_streets.xml");
 		for (int i=0;i< path.getSos().getNodes().size();i++){
 			System.out.println(path.getSos().getStreets().get(0).getNode().get(i).getNum());
 		}
-	}
+	}*/
 
 }

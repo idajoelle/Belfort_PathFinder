@@ -7,6 +7,7 @@ public class Node {
 	float y;
 	
 	
+	
 	public Node(int num) {
 		
 		this.num = num;
@@ -18,6 +19,11 @@ public class Node {
 		this.num = num;
 		this.x = x;
 		this.y = y;
+	}
+	
+	public void setNode(Node n){
+		this.x = n.x;
+		this.y = n.y;
 	}
 
 
@@ -46,6 +52,6 @@ public class Node {
 	public void setY(float y) {
 		this.y = y;
 	}	
-	
+
 		
 	}

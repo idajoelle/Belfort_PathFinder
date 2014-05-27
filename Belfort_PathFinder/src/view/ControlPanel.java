@@ -45,6 +45,7 @@ public class ControlPanel extends JPanel {
 		setOpaque(false);
 		setBackground(Color.black);
 		setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+		
 		setLayout(new BorderLayout());
 
 		Action zoomInAction = new AbstractAction() {

@@ -46,6 +46,7 @@ public class Street {
 	public Node getPosition(int pos){
 		
 		return points.get(pos);
+		
 	}
 	
 	//Return number of nodes on a street

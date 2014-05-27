@@ -19,6 +19,7 @@ public class OverlayPanel extends JPanel {
 		
 		setBackground(new Color(51, 204, 102));
 		setPreferredSize(new Dimension(400, 200));
+		
 		setOpaque(false);
 	}
 
